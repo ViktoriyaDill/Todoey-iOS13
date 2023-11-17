@@ -49,11 +49,16 @@ class ToDoListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCells", for: indexPath)
         cell.textLabel?.text = itemArrey[indexPath.row].title
         
-        if item.done == true {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-        }
+        
+        
+//        if item.done == true {
+//            cell.accessoryType = .checkmark
+//        } else {
+//            cell.accessoryType = .none
+//        }
+//        Do the same with ternary operator
+//        value = contitions ? valueTrue : valueFalse
+        cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
     }
