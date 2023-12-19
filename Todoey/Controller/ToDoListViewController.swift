@@ -11,11 +11,13 @@ import UIKit
 class ToDoListViewController: UITableViewController {
 
     var itemArrey = [Item]()
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+//        print(dataFilePath)
         
         let newItem = Item()
         newItem.title = "Buy water"
@@ -47,7 +49,7 @@ class ToDoListViewController: UITableViewController {
         let item = itemArrey[indexPath.row]
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCells", for: indexPath)
-        cell.textLabel?.text = itemArrey[indexPath.row].title
+        cell.textLabel?.text = item.title
         
         
         
@@ -75,41 +77,47 @@ class ToDoListViewController: UITableViewController {
 //       } else {
 //           item.done = false
 //       }
-        
+
         item.done = !item.done
-        
-        tableView.reloadData()
+        saveDataItem()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
 //    MARK: - Add New Item
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
-        
-        var textField = UITextField()
-        let item = Item()
-        item.title = textField.text!
-        
-        
         let alert = UIAlertController(title: "Add new todoey item", message: "", preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: "Add", style: .default) { (action) in
-            self.itemArrey.append(item)
-            self.defaults.set(self.itemArrey, forKey: "TodoListArrey")
-            
-            self.tableView.reloadData()
-        }
         
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create a new item"
-            textField = alertTextField
+        }
+        
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in
+            if let text = alert.textFields?.first?.text {
+                let newItem = Item()
+                newItem.title = text
+                self.itemArrey.append(newItem)
+                
+                self.saveDataItem()
+            }
         }
         
         alert.addAction(action)
         present(alert, animated: true)
     }
-    
-    
+
+    func saveDataItem () {
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(itemArrey)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        
+        self.tableView.reloadData()
+    }
 
 
 }
